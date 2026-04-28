@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="21.0.0">
+  <diagram id="page1" name="Telemetry and Heartbeat">
+    <mxGraphModel dx="1422" dy="762" grid="0" gridSize="10" guides="1"
+                  tooltips="1" connect="1" arrows="1" fold="1" page="0"
+                  pageScale="1" pageWidth="1654" pageHeight="1169"
+                  math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="10" value="Telemetry and Heartbeat Flow: Pod Traffic → PCE → Splunk
+How flow records and VEN health data travel from the cluster to the PCE and SIEM" style="rounded=1;arcSize=3;fillColor=#E0F5EC;strokeColor=#0D7A5F;fontColor=#064F3C;fontStyle=1;fontSize=15;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1600" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="11" value="TELEMETRY PATH  —  Flow records from pod traffic to Splunk" style="swimlane;startSize=35;fillColor=#E0F5EC;strokeColor=#0D7A5F;fontColor=#064F3C;fontStyle=1;fontSize=13;fontFamily=Arial;strokeWidth=2;rounded=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="0" y="65" width="1600" height="430" as="geometry"/>
+        </mxCell>
+        <mxCell id="12" value="📦 Pod / Container
+Generates network traffic.
+All flows observed
+by host C-VEN." style="rounded=1;arcSize=5;fillColor=#E3EFFC;strokeColor=#1A66B5;fontColor=#0C3F75;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=1.5;" vertex="1" parent="11">
+          <mxGeometry x="15" y="45" width="295" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="13" value="🛡️ C-VEN
+Captures flow metadata:
+src/dst IP, port, protocol,
+pd decision code (1/2/3)." style="rounded=1;arcSize=5;fillColor=#E3EFFC;strokeColor=#1A66B5;fontColor=#0C3F75;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=1.5;" vertex="1" parent="11">
+          <mxGeometry x="330" y="45" width="295" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="14" value="💾 Storage Pod
+Buffers flow records locally
+in embedded etcd.
+Uploads batch to PCE." style="rounded=1;arcSize=5;fillColor=#FEF0DA;strokeColor=#9B5E0C;fontColor=#6B3D06;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=1.5;" vertex="1" parent="11">
+          <mxGeometry x="645" y="45" width="295" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="15" value="🖥️ PCE Event Service
+Receives flow telemetry.
+Aggregates records.
+Stores in data nodes." style="rounded=1;arcSize=5;fillColor=#EDE9FD;strokeColor=#5B4CC4;fontColor=#3B2E8A;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=1.5;" vertex="1" parent="11">
+          <mxGeometry x="960" y="45" width="295" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="16" value="🔍 Splunk / SIEM
+Receives via syslog.
+pd=1/2/3 dashboards.
+Blocked flow alerts." style="rounded=1;arcSize=5;fillColor=#F5F2EC;strokeColor=#6B6860;fontColor=#3F3E3A;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=1.5;" vertex="1" parent="11">
+          <mxGeometry x="1275" y="45" width="295" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="17" value="" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2.5;strokeColor=#9B5E0C;endArrow=block;endFill=1;fontFamily=Arial;fontSize=10;fontColor=#9B5E0C;fontStyle=1;rounded=1;" edge="1" source="12" target="13" parent="11">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="18" value="" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2.5;strokeColor=#9B5E0C;endArrow=block;endFill=1;fontFamily=Arial;fontSize=10;fontColor=#9B5E0C;fontStyle=1;rounded=1;" edge="1" source="13" target="14" parent="11">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="19" value="" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2.5;strokeColor=#9B5E0C;endArrow=block;endFill=1;fontFamily=Arial;fontSize=10;fontColor=#9B5E0C;fontStyle=1;rounded=1;" edge="1" source="14" target="15" parent="11">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="20" value="" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2.5;strokeColor=#9B5E0C;endArrow=block;endFill=1;fontFamily=Arial;fontSize=10;fontColor=#9B5E0C;fontStyle=1;rounded=1;" edge="1" source="15" target="16" parent="11">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="21" value="📈 PCE Explorer
+
+Real-time flow visualization.
+Filter by label, IP, port.
+Policy decision overlay.
+Time-range queries." style="rounded=1;arcSize=5;fillColor=#EDE9FD;strokeColor=#5B4CC4;fontColor=#3B2E8A;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=1.5;" vertex="1" parent="11">
+          <mxGeometry x="960" y="215" width="295" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="22" value="also viewable
+in Explorer" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=8 4;strokeWidth=1.5;strokeColor=#5B4CC4;endArrow=block;endFill=1;fontFamily=Arial;fontSize=10;fontColor=#5B4CC4;fontStyle=1;rounded=1;" edge="1" source="15" target="21" parent="11">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="23" value="HEARTBEAT PATH  —  C-VEN health reporting to PCE (separate channel, port 443)" style="swimlane;startSize=35;fillColor=#E3EFFC;strokeColor=#1A66B5;fontColor=#0C3F75;fontStyle=1;fontSize=13;fontFamily=Arial;strokeWidth=2;rounded=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="0" y="510" width="1600" height="310" as="geometry"/>
+        </mxCell>
+        <mxCell id="24" value="🛡️ C-VEN
+Sends heartbeat to PCE
+every ~5 minutes.
+Includes VEN version,
+enforcement mode, status." style="rounded=1;arcSize=5;fillColor=#E3EFFC;strokeColor=#1A66B5;fontColor=#0C3F75;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=1.5;" vertex="1" parent="23">
+          <mxGeometry x="15" y="45" width="310" height="155" as="geometry"/>
+        </mxCell>
+        <mxCell id="25" value="🖥️ PCE API Layer
+Receives heartbeat.
+Updates VEN status
+and last-seen timestamp
+in workload inventory." style="rounded=1;arcSize=5;fillColor=#EDE9FD;strokeColor=#5B4CC4;fontColor=#3B2E8A;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=1.5;" vertex="1" parent="23">
+          <mxGeometry x="355" y="45" width="310" height="155" as="geometry"/>
+        </mxCell>
+        <mxCell id="26" value="✅ Status: Online
+
+Heartbeat received
+within last ~15 min.
+Enforcement confirmed
+active on this node." style="rounded=1;arcSize=5;fillColor=#E4F5E2;strokeColor=#2E7D32;fontColor=#1B4D1D;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=1.5;" vertex="1" parent="23">
+          <mxGeometry x="715" y="45" width="280" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="27" value="⚠️ Status: Stale
+
+3+ missed heartbeats
+(~15 min no contact).
+PCE flags as Stale.
+STALE ≠ NOT ENFORCING
+Local cache still active!" style="rounded=1;arcSize=5;fillColor=#FEF0DA;strokeColor=#9B5E0C;fontColor=#6B3D06;fontSize=11;fontFamily=Arial;align=center;verticalAlign=middle;whiteSpace=wrap;strokeWidth=1.5;" vertex="1" parent="23">
+          <mxGeometry x="715" y="185" width="280" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="28" value="" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2.5;strokeColor=#1A66B5;endArrow=block;endFill=1;fontFamily=Arial;fontSize=10;fontColor=#1A66B5;fontStyle=1;rounded=1;" edge="1" source="24" target="25" parent="23">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="29" value="heartbeat
+received" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=1.5;strokeColor=#2E7D32;endArrow=block;endFill=1;fontFamily=Arial;fontSize=10;fontColor=#2E7D32;fontStyle=1;rounded=1;" edge="1" source="25" target="26" parent="23">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="30" value="heartbeat
+missed 3x" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=1.5;strokeColor=#9B5E0C;endArrow=block;endFill=1;fontFamily=Arial;fontSize=10;fontColor=#9B5E0C;fontStyle=1;rounded=1;" edge="1" source="25" target="27" parent="23">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="31" value="🔴  KEY OPERATIONAL NOTES
+
+STALE ≠ NOT ENFORCING:  A C-VEN marked Stale in PCE is still enforcing iptables rules from its local Storage Pod cache.
+  Do NOT unpair a C-VEN just because PCE shows it as Stale — first verify the pod is actually gone from the cluster.
+
+406 THROTTLING IMPACT:  If PCE returns 406 on telemetry uploads, flow records buffer in Storage Pod locally.
+  Storage Pod buffer overflow causes permanent flow record loss for that time window — visible as near-zero pd counts in Splunk.
+
+STORAGE POD ETCD HEALTH:  kubectl exec &lt;storage-pod&gt; -n illumio-system -- etcdctl endpoint health
+  Unhealthy etcd (error: user name is empty / WAL lock failures) = no policy updates AND no telemetry upload.
+  Root cause of the April 2026 PCE performance incident at Huntington." style="rounded=1;arcSize=3;fillColor=#FDE8E0;strokeColor=#C14B1A;fontColor=#8A2E0A;fontSize=11;fontFamily=Arial;align=left;verticalAlign=middle;whiteSpace=wrap;spacingLeft=8;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="0" y="832" width="1600" height="160" as="geometry"/>
+        </mxCell>
+        <mxCell id="32" value="📊  KEY SPLUNK QUERIES
+
+Blocked flows:     index=illumio sourcetype=illumio:flow pd=2 | stats count by src_labels,dst_labels,dst_port | sort -count
+Unknown flows:     index=illumio sourcetype=illumio:flow pd=3 | where like(dst_labels, E-PD-scope) | stats count by src_labels,dst_labels,dst_port
+Decision trend:    index=illumio sourcetype=illumio:flow | timechart span=30m count by pd
+C-VEN heartbeat:   index=illumio sourcetype=illumio:ven_event event_type=heartbeat_failure | stats count by hostname,last_heartbeat" style="rounded=1;arcSize=3;fillColor=#FEF0DA;strokeColor=#9B5E0C;fontColor=#6B3D06;fontSize=11;fontFamily=Arial;align=left;verticalAlign=middle;whiteSpace=wrap;spacingLeft=8;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="0" y="1005" width="1600" height="145" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
