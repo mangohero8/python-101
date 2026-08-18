@@ -1,0 +1,1794 @@
+openapi: 3.0.3
+####################################################################################################
+# CYBER INVENTORY SERVICE - SERVERS COLLECTION
+#
+# Built from HNB_ExampleHeartbeats_3.1 20250319AGW.yaml
+# Conforms to the Huntington API/OAS Review Checklist.
+#
+# HOW TO USE THIS FILE
+#   Every open decision is tagged inline as [ANSWER-NEEDED Qnn] and cross-references
+#   the numbered item in QUESTION-SHEET.md. Find them all with:
+#
+#       grep -n "ANSWER-NEEDED" <thisfile>
+#
+#   NOTHING should be submitted to API Governance until that grep returns zero results.
+#
+# SCOPE OF THIS FILE
+#   ONE OAS defines ONE Collection. This file is the SERVERS collection only.
+#   The APPLICATIONS collection is a separate OAS, generated from this one by
+#   substituting the collection name, resource id, and field set. See
+#   CLAUDE-BUILD-SPEC.md section 7 for the substitution procedure.
+#
+# PLACEHOLDER VALUES IN USE (all require Governance approval before submission)
+#   collection (oas)     : cyber-inventories-servers
+#   collection (code)    : cyberInventoriesServers
+#   resource id          : cyberInventoriesServerId
+#   abbreviation         : cy-inv-srvr          <- Governance ASSIGNS this
+#   module               : hnb-cy-inv-srvr      <- depends on classification, see Q02
+#   scope                : cy-inv-srvr:read
+#
+# WHY THESE PLACEHOLDERS ARE WELL-FORMED (per "Modeling: Do the Collection name and
+# abbreviations match the naming standards?")
+#   - nodes separated by dash
+#   - right-most token plural  : servers        OK
+#   - second-level plural      : inventories    OK
+#   - first level singular (>1 level): cyber    OK
+#   - resource id = singular collection + Id, dashes removed, next char upcased
+#         cyber-inventories-server -> cyberInventoriesServerId   OK
+####################################################################################################
+info:
+  contact:
+    # [ANSWER-NEEDED Q05] Name of the HNB IT team that owns this OAS.
+    name: PLACEHOLDER Cyber Engineering
+    # [ANSWER-NEEDED Q05] URL where the SoR documents this API, sample use cases, etc.
+    url: https://huntingtoncloud.sharepoint.com/sites/PLACEHOLDER
+    # [ANSWER-NEEDED Q05] Support email for the owning IT team.
+    email: PLACEHOLDER@huntington.com
+
+  # Title convention depends on classification - see [ANSWER-NEEDED Q02]
+  #   HNB          -> "Huntington <Collection Name> API"
+  #   Orchestration-> "Orchestration / Composite <Collection> API"
+  #   App          -> "Application <Abbrev> <Collection Name> API"
+  # NOTE: this service reads from CMDB (ServiceNow is the SoR) and later a datalake, and
+  #       holds no authoritative data of its own. Per the standard that is the definition
+  #       of an Orchestration/Composite API. Confirm with Governance.
+  title: Huntington Cyber Inventories Servers API
+
+  description: >-
+    Retrieves server inventory and security posture across the Huntington fleet, sourced from
+    the Configuration Management Database and enriched with vulnerability, currency, and risk
+    rating information. Supports fleet-wide reporting, coverage gap analysis, and per-server
+    lookup by asset identifier, application correlation identifier, support group, or risk rating.
+
+  # [ANSWER-NEEDED Q01] THE SINGLE BIGGEST BLOCKER.
+  # The collection name and its abbreviation must be approved by API Governance /
+  # Data Modeling BEFORE this OAS is written. The standard is explicit:
+  #   "it is best to confirm the collection name using the API Development Guidance
+  #    process before creating an OAS"
+  # The name below is a well-formed PLACEHOLDER, not an approved name. It determines:
+  #   the filename, the module name, the title, every scope, and the prefix on all
+  #   96 schemas in this document.
+  x-hnb.collection:
+   - oas: "cyber-inventories-servers"
+   - code: "cyberInventoriesServers"
+   - resourceDefinition:
+      $ref: "#/components/schemas/cyber-inventories-servers_RESOURCE"
+
+  # major.minor.patch - only major.minor appear in the filename and module URL
+  version: 1.0.0
+
+  # Union of every scope used anywhere in this document.
+  # [ANSWER-NEEDED Q06] Confirm scope names against the API Governance master scope list.
+  x-hnb.scopes: ["cy-inv-srvr:read"]
+
+  x-hnb.target:
+    # [ANSWER-NEEDED Q07] Is this implemented behind the EQH, or direct to the SoR?
+    #   EQH  -> the EQH answers GETs; the full __common_* query parameter set applies
+    #   GCP  -> Fuse-on-GCP implementation answers directly; a subset applies
+    # This choice determines which query parameters below are real vs. aspirational.
+    - default: GCP
+    # [ANSWER-NEEDED Q08] Deployment endpoints per environment. Not known until the
+    # service is deployed; placeholders below MUST be replaced before submission.
+    - dv:
+        audience: https://PLACEHOLDER-dv.run.app
+        endpoint: https://PLACEHOLDER-dv.run.app/hnb-cy-inv-srvr/1.0
+    - in:
+        audience: https://PLACEHOLDER-in.run.app
+        endpoint: https://PLACEHOLDER-in.run.app/hnb-cy-inv-srvr/1.0
+    - qa:
+        audience: https://PLACEHOLDER-qa.run.app
+        endpoint: https://PLACEHOLDER-qa.run.app/hnb-cy-inv-srvr/1.0
+    - st:
+        audience: https://PLACEHOLDER-st.run.app
+        endpoint: https://PLACEHOLDER-st.run.app/hnb-cy-inv-srvr/1.0
+    - tr:
+        audience: https://PLACEHOLDER-tr.run.app
+        endpoint: https://PLACEHOLDER-tr.run.app/hnb-cy-inv-srvr/1.0
+    - pd:
+        audience: https://PLACEHOLDER-pd.run.app
+        endpoint: https://PLACEHOLDER-pd.run.app/hnb-cy-inv-srvr/1.0
+
+  # [ANSWER-NEEDED Q04] CMDB Correlation Id of the IT team that OWNS this API.
+  x-hnb.cmdbCorrelationId: "PLACEHOLDER"
+  # [ANSWER-NEEDED Q04] CMDB Name matching the correlation id above.
+  x-hnb.cmdbName: "PLACEHOLDER"
+  # [ANSWER-NEEDED Q05]
+  x-hnb.ownerEmail: PLACEHOLDER@huntington.com
+  # [ANSWER-NEEDED Q05]
+  x-hnb.approverEmail: PLACEHOLDER@huntington.com
+
+  # This collection is READ-ONLY in v1 [ANSWER-NEEDED Q09], so there are no POST/PATCH
+  # operations for idempotency to protect. 'Disabled' is correct unless Q09 changes.
+  x-hnb.idempotency: 'Disabled'
+
+  # HNB | App | AppSM | <VendorName> - must match Classification on the Deployment Summary.
+  # [ANSWER-NEEDED Q02]
+  x-hnb.proxyPrefix: 'HNB'
+
+  x-hnb.quota:
+    # [ANSWER-NEEDED Q10] Expected call volumes. The values below are copied from the
+    # Heartbeats example and are almost certainly wrong for a fleet-wide inventory API -
+    # a nightly coverage report pulling every server could exceed Gold in one run.
+    - environment: np
+      values:
+      - type: Bronze
+        count: 10
+        interval: 1
+        timeUnit: minute
+      - type: Silver
+        count: 100
+        interval: 1
+        timeUnit: minute
+      - type: Gold
+        count: 1000
+        interval: 1
+        timeUnit: minute
+    - environment: pd
+      values:
+      - type: Bronze
+        count: 500
+        interval: 1
+        timeUnit: minute
+      - type: Silver
+        count: 5000
+        interval: 1
+        timeUnit: minute
+      - type: Gold
+        count: 10000
+        interval: 1
+        timeUnit: minute
+####################################################################################################
+tags:
+  # Plural tag  -> operations on the Collection
+  # Singular tag-> operations on a specific Resource
+  - name: Cyber Inventories Servers
+    description: "Operations on the Collection"
+  - name: Cyber Inventories Server
+    description: "Operations on a specific Resource"
+  - name: Ping
+    description: "Operations to test availability"
+####################################################################################################
+servers:
+  # [ANSWER-NEEDED Q11] Is this API internal-only? If yes, DELETE the External
+  # (Colleague/Partner) and External (Customer/Fintech) entries below.
+  #
+  # STRONG RECOMMENDATION: internal only. A server inventory with hostnames, IP
+  # addresses, operating system versions, internet-facing flags, and open
+  # vulnerability counts is a target list. It should not be reachable from an
+  # external gateway. Raise this at Cyber Architecture Review.
+  - url: "https://localhost:8080/{module}/{version}"
+    description: Execute locally
+    variables: { module:{ enum: [hnb-cy-inv-srvr], default: hnb-cy-inv-srvr }, version:{ enum: ["1.0"], default: "1.0"} }
+  - url: "https://{mock}-{env}-int.hban.us/{module}/{version}"
+    description: (DV, IN, QA, ST, TR) Internal AGW
+    variables: { module:{ enum: [hnb-cy-inv-srvr], default: hnb-cy-inv-srvr }, version:{ enum: ["1.0"], default: "1.0"},
+    mock:{ enum: [mock-agw,agw], default: mock-agw }, env:{ enum: [dv,in,qa,st,tr], default: in } }
+  - url: "https://{mock}-int.hban.us/{module}/{version}"
+    description: PD (Production) Internal AGW
+    variables: { module:{ enum: [hnb-cy-inv-srvr], default: hnb-cy-inv-srvr }, version:{ enum: ["1.0"], default: "1.0"},
+    mock:{ enum: [mock-agw,agw], default: mock-agw }, env:{ enum: [pd], default: pd } }
+####################################################################################################
+paths:
+  ##################################################################################################
+  # COLLECTION OPERATIONS (plural tag, plural operationId)
+  ##################################################################################################
+  /cyber-inventories-servers/summary:
+    get:
+      operationId: getCyberInventoriesServersSummary
+      tags: ["Cyber Inventories Servers"]
+      summary: "Retrieve a list of (aka search for) Cyber Inventories Servers with brief details"
+      description: |
+        Returns a minimal projection of each matching server - identifier, name, description, environment,
+        and operational status - without the infrastructure, ownership, lifecycle, risk, or vulnerability
+        aggregates. Use this for pick-lists, counts, and coverage reports where the full payload is not needed.
+        <br/><br/>Every field returned here is a strict subset of the full resource, in the same structure.
+        | HTTP Status | severity | statusCode | Use Case when returned |
+        |-----------|----------|------------|-----------------------------------|
+        | 200       | info     | HNB-0000   | Zero or more resources matched |
+      x-hnb.scopes: ["cy-inv-srvr:read"]
+      parameters:
+        - $ref: "#/components/parameters/assetId_Query"
+        - $ref: "#/components/parameters/serverName_Query"
+        - $ref: "#/components/parameters/environmentCode_Query"
+        - $ref: "#/components/parameters/operationalStatusCode_Query"
+        - $ref: "#/components/parameters/applicationCorrelationReference_Query"
+        - $ref: "#/components/parameters/supportGroupName_Query"
+        - $ref: "#/components/parameters/riskRatingCode_Query"
+        - $ref: "#/components/parameters/internetFacingIndicator_Query"
+        - $ref: "#/components/parameters/__common_item_count_Query"
+        - $ref: "#/components/parameters/__common_item_offset_Query"
+        - $ref: "#/components/parameters/__common_include_total_results_Query"
+        - $ref: "#/components/parameters/__common_count_only_Query"
+        - $ref: "#/components/parameters/__common_sort_by_Query"
+      responses:
+        '200':
+          $ref: "#/components/responses/HTTP_200_collection_summary"
+        '400':
+          $ref: "#/components/responses/__common_HTTP_400"
+        '401':
+          $ref: "#/components/responses/__common_HTTP_401"
+        '403':
+          $ref: "#/components/responses/__common_HTTP_403"
+        '500':
+          $ref: "#/components/responses/__common_HTTP_500"
+        default:
+          $ref: "#/components/responses/__common_HTTP_default"
+
+  /cyber-inventories-servers:
+    get:
+      operationId: getCyberInventoriesServers
+      tags: ["Cyber Inventories Servers"]
+      summary: "Retrieve a list of (aka search for) Cyber Inventories Servers"
+      description: |
+        Returns the full resource for every matching server. This is a search - an empty result set is a
+        200 with zero items, NOT a 404.
+        <br/><br/>Aggregates are returned according to the show_* parameters. Requesting the whole fleet with
+        every aggregate expanded is an expensive call; prefer /summary plus targeted single-resource reads.
+        <br/><br/>NOTE ON DATA COMPLETENESS: the CMDB is not the authoritative source for every attribute of
+        every server. The dataQuality aggregate reports which source supplied the record and when it was last
+        reconciled. Absence of a server from this collection does NOT prove the server does not exist -
+        see the coverage reporting guidance in the API documentation. [ANSWER-NEEDED Q16]
+        | HTTP Status | severity | statusCode | Use Case when returned |
+        |-----------|----------|------------|-----------------------------------|
+        | 200       | info     | HNB-0000   | Zero or more resources matched |
+      x-hnb.scopes: ["cy-inv-srvr:read"]
+      parameters:
+        - $ref: "#/components/parameters/assetId_Query"
+        - $ref: "#/components/parameters/serverName_Query"
+        - $ref: "#/components/parameters/fullyQualifiedDomainName_Query"
+        - $ref: "#/components/parameters/environmentCode_Query"
+        - $ref: "#/components/parameters/operationalStatusCode_Query"
+        - $ref: "#/components/parameters/installStatusCode_Query"
+        - $ref: "#/components/parameters/applicationCorrelationReference_Query"
+        - $ref: "#/components/parameters/supportGroupName_Query"
+        - $ref: "#/components/parameters/riskRatingCode_Query"
+        - $ref: "#/components/parameters/internetFacingIndicator_Query"
+        - $ref: "#/components/parameters/virtualIndicator_Query"
+        - $ref: "#/components/parameters/operatingSystemName_Query"
+        - $ref: "#/components/parameters/lastDiscoveredTimestamp_min_Query"
+        - $ref: "#/components/parameters/lastDiscoveredTimestamp_max_Query"
+        - $ref: "#/components/parameters/show_infrastructure_Query"
+        - $ref: "#/components/parameters/show_ownership_Query"
+        - $ref: "#/components/parameters/show_lifecycle_Query"
+        - $ref: "#/components/parameters/show_riskAndSecurity_Query"
+        - $ref: "#/components/parameters/show_vulnerability_Query"
+        - $ref: "#/components/parameters/show_dataQuality_Query"
+        - $ref: "#/components/parameters/__common_field_list_Query"
+        - $ref: "#/components/parameters/__common_item_count_Query"
+        - $ref: "#/components/parameters/__common_item_offset_Query"
+        - $ref: "#/components/parameters/__common_include_total_results_Query"
+        - $ref: "#/components/parameters/__common_count_only_Query"
+        - $ref: "#/components/parameters/__common_sort_by_Query"
+        - $ref: "#/components/parameters/__common_include_metadata_Query"
+      responses:
+        '200':
+          $ref: "#/components/responses/HTTP_200_collection"
+        '400':
+          $ref: "#/components/responses/__common_HTTP_400"
+        '401':
+          $ref: "#/components/responses/__common_HTTP_401"
+        '403':
+          $ref: "#/components/responses/__common_HTTP_403"
+        '500':
+          $ref: "#/components/responses/__common_HTTP_500"
+        default:
+          $ref: "#/components/responses/__common_HTTP_default"
+
+  ##################################################################################################
+  # BULK RETRIEVE (POST-as-GET)
+  #
+  # WHY THIS EXISTS: a caller reconciling the fleet will need to look up several hundred asset
+  # identifiers at once. That exceeds practical URL length limits on a GET. The standard's
+  # /retrieve pattern converts the POST into a GET for exactly this case.
+  # It is NOT a limiter and it does NOT create resources.
+  # [ANSWER-NEEDED Q12] Confirm bulk lookup is required for v1. If not, delete both /retrieve paths.
+  ##################################################################################################
+  /cyber-inventories-servers/retrieve/summary:
+    post:
+      operationId: retrieveCyberInventoriesServersSummary
+      tags: ["Cyber Inventories Servers"]
+      summary: "Retrieve (via a POST) a list of (aka search for) Cyber Inventories Servers with brief details"
+      description: |
+        Identical result to GET /cyber-inventories-servers/summary, but accepts the selection criteria in a
+        request body. Use when the criteria list is too large for a URL.
+      x-hnb.scopes: ["cy-inv-srvr:read"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/cyber-inventories-servers_RETRIEVE_Request"
+      responses:
+        '200':
+          $ref: "#/components/responses/HTTP_200_collection_summary"
+        '400':
+          $ref: "#/components/responses/__common_HTTP_400"
+        '401':
+          $ref: "#/components/responses/__common_HTTP_401"
+        '403':
+          $ref: "#/components/responses/__common_HTTP_403"
+        '500':
+          $ref: "#/components/responses/__common_HTTP_500"
+        default:
+          $ref: "#/components/responses/__common_HTTP_default"
+
+  /cyber-inventories-servers/retrieve:
+    post:
+      operationId: retrieveCyberInventoriesServers
+      tags: ["Cyber Inventories Servers"]
+      summary: "Retrieve (via a POST) a list of (aka search for) Cyber Inventories Servers"
+      description: |
+        Identical result to GET /cyber-inventories-servers, but accepts the selection criteria in a
+        request body. Use when the criteria list is too large for a URL.
+      x-hnb.scopes: ["cy-inv-srvr:read"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/cyber-inventories-servers_RETRIEVE_Request"
+      responses:
+        '200':
+          $ref: "#/components/responses/HTTP_200_collection"
+        '400':
+          $ref: "#/components/responses/__common_HTTP_400"
+        '401':
+          $ref: "#/components/responses/__common_HTTP_401"
+        '403':
+          $ref: "#/components/responses/__common_HTTP_403"
+        '500':
+          $ref: "#/components/responses/__common_HTTP_500"
+        default:
+          $ref: "#/components/responses/__common_HTTP_default"
+
+  ##################################################################################################
+  # SINGLE RESOURCE OPERATIONS (singular tag, singular operationId)
+  #
+  # CRITICAL: the ONLY legal path parameter is the collection's own resource id.
+  # The standard is explicit:
+  #     Correct  : GET /customer-relationships-accounts?accountId=98765
+  #     Incorrect: GET /customer-relationships-accounts/{accountId}
+  #
+  # Therefore asset id is a QUERY parameter above, not a path parameter here.
+  # [ANSWER-NEEDED Q03] Confirm cyberInventoriesServerId maps to CMDB sys_id (a 32-char GUID).
+  # If Governance instead blesses assetId as the resource identifier, this whole section
+  # changes and the GUID requirement needs an approved exception.
+  ##################################################################################################
+  /cyber-inventories-servers/{cyberInventoriesServerId}/summary:
+    get:
+      operationId: getCyberInventoriesServerSummary
+      tags: ["Cyber Inventories Server"]
+      summary: "Retrieve a specific Cyber Inventories Server with brief details"
+      description: |
+        Returns the same subset of fields as the collection /summary operation, for one server.
+        <br/><br/>Note that if the specified resource does not exist a "404 - Not found" is returned,
+        as this is NOT a search.
+        | HTTP Status | severity | statusCode | Use Case when returned |
+        |-----------|----------|------------|-----------------------------------|
+        | 404       | error    | HNB-0008   | Resource Not Found |
+      x-hnb.scopes: ["cy-inv-srvr:read"]
+      parameters:
+        - $ref: "#/components/parameters/cyberInventoriesServerId_Path"
+      responses:
+        '200':
+          $ref: "#/components/responses/HTTP_200_summary"
+        '400':
+          $ref: "#/components/responses/__common_HTTP_400"
+        '401':
+          $ref: "#/components/responses/__common_HTTP_401"
+        '403':
+          $ref: "#/components/responses/__common_HTTP_403"
+        '404':
+          $ref: "#/components/responses/__common_HTTP_404"
+        '500':
+          $ref: "#/components/responses/__common_HTTP_500"
+        default:
+          $ref: "#/components/responses/__common_HTTP_default"
+
+  /cyber-inventories-servers/{cyberInventoriesServerId}:
+    get:
+      operationId: getCyberInventoriesServer
+      tags: ["Cyber Inventories Server"]
+      summary: "Retrieve a specific Cyber Inventories Server"
+      description: |
+        Returns the requested server and all of its fields, unless a subset is specified in the
+        field_list query parameter or aggregates are suppressed with show_* parameters.
+        <br/><br/>Note that if the specified resource does not exist a "404 - Not found" is returned,
+        as this is NOT a search.
+        | HTTP Status | severity | statusCode | Use Case when returned |
+        |-----------|----------|------------|-----------------------------------|
+        | 404       | error    | HNB-0008   | Resource Not Found |
+      x-hnb.scopes: ["cy-inv-srvr:read"]
+      parameters:
+        - $ref: "#/components/parameters/cyberInventoriesServerId_Path"
+        - $ref: "#/components/parameters/show_infrastructure_Query"
+        - $ref: "#/components/parameters/show_ownership_Query"
+        - $ref: "#/components/parameters/show_lifecycle_Query"
+        - $ref: "#/components/parameters/show_riskAndSecurity_Query"
+        - $ref: "#/components/parameters/show_vulnerability_Query"
+        - $ref: "#/components/parameters/show_dataQuality_Query"
+        - $ref: "#/components/parameters/__common_field_list_Query"
+        - $ref: "#/components/parameters/__common_include_metadata_Query"
+        - $ref: "#/components/parameters/__common_expand_resources_Query"
+      responses:
+        '200':
+          $ref: "#/components/responses/HTTP_200_EXPANDEDRESOURCE"
+        '400':
+          $ref: "#/components/responses/__common_HTTP_400"
+        '401':
+          $ref: "#/components/responses/__common_HTTP_401"
+        '403':
+          $ref: "#/components/responses/__common_HTTP_403"
+        '404':
+          $ref: "#/components/responses/__common_HTTP_404"
+        '500':
+          $ref: "#/components/responses/__common_HTTP_500"
+        default:
+          $ref: "#/components/responses/__common_HTTP_default"
+
+  ##################################################################################################
+  # PING - copied from Heartbeats. Note the scope difference between the two.
+  ##################################################################################################
+  /cyber-inventories-servers/ping:
+    get:
+      operationId: getCyberInventoriesServersPing
+      tags: ["Ping"]
+      summary: "Returns canned message from the application"
+      description: |
+        Confirms the application behind the gateway is reachable and responding.
+      x-hnb.scopes: ["cy-inv-srvr:read"]
+      responses:
+        '200':
+          $ref: "#/components/responses/__common_ping_HTTP_200"
+        '400':
+          $ref: "#/components/responses/__common_HTTP_400"
+        '401':
+          $ref: "#/components/responses/__common_HTTP_401"
+        '403':
+          $ref: "#/components/responses/__common_HTTP_403"
+        '500':
+          $ref: "#/components/responses/__common_HTTP_500"
+        default:
+          $ref: "#/components/responses/__common_HTTP_default"
+
+  /ping:
+    get:
+      operationId: getCyberInventoriesServersPingProxy
+      tags: ["Ping"]
+      summary: "Returns canned message from the AGW"
+      description: |
+        Confirms the API Gateway proxy is reachable. Does NOT reach the application.
+      # Scope is deliberately empty for the proxy ping. DO NOT MODIFY - per the standard.
+      x-hnb.scopes: [""]
+      responses:
+        '200':
+          $ref: "#/components/responses/__common_ping_HTTP_200"
+        '400':
+          $ref: "#/components/responses/__common_HTTP_400"
+        '401':
+          $ref: "#/components/responses/__common_HTTP_401"
+        '403':
+          $ref: "#/components/responses/__common_HTTP_403"
+        '500':
+          $ref: "#/components/responses/__common_HTTP_500"
+        default:
+          $ref: "#/components/responses/__common_HTTP_default"
+####################################################################################################
+# SECURITY
+#
+# Applied globally. Per the standard (2023-05-22) the default security stanza is used for ALL
+# operations and SHOULD NOT be overridden per operation.
+#   _correlationId          - REQUIRED on every call including GET; logging and tracing depend on it
+#   X-HNB.originatingChannel- CMDB Correlation Id of the application that originated the request
+#   X-HNB.requestingChannel - CMDB Correlation Id of the application actually making the call
+#   Auth_Bearer             - the OAuth2 token issued by the AGW
+####################################################################################################
+security:
+  - Auth_correlationId: []
+    Auth_originatingChannel: []
+    Auth_requestingChannel: []
+    Auth_Bearer: []
+####################################################################################################
+components:
+  ##################################################################################################
+  # COMMON COMPONENTS
+  #
+  # !! IMPORTANT !!
+  # The standard says of this section in Heartbeats:
+  #     "AVOID changing (i.e. DO NOT change) anything from here to
+  #      'common components and responses END'."
+  #
+  # The definitions below are functionally correct and let this file validate standalone, but
+  # BEFORE SUBMISSION you should COPY THE COMMON SECTION VERBATIM from the current
+  # HNB_ExampleHeartbeats template rather than relying on these. Hand-maintained copies drift,
+  # and drift in the common section is what breaks the onboarding automation.
+  # [ANSWER-NEEDED Q13] Confirm which Heartbeats version is current at build time and copy from it.
+  ##################################################################################################
+  securitySchemes:
+    Auth_sessionId:
+      type: apiKey
+      name: sessionId
+      in: header
+      description: "Unique Id for overall user session generated by the caller - ideally a GUID/UUID - but any opaque string.  This Id would be used on ALL API calls made within that session."
+    Auth_correlationId:
+      type: apiKey
+      name: _correlationId
+      in: query
+      description: "Unique Id for the initiating request generated by the caller - ideally a GUID/UUID - but any opaque string.  The prefix _ is used on a GET or DELETE operation (that does not have a payload) to assign the correlationId for this request."
+    Auth_originatingChannel:
+      type: apiKey
+      name: X-HNB.originatingChannel
+      in: header
+      description: "CMDB Correlation (or Assigned) Id of Application originating the request"
+    Auth_requestingChannel:
+      type: apiKey
+      name: X-HNB.requestingChannel
+      in: header
+      description: "CMDB Correlation (or Assigned) Id of Application making the actual request (may differ from X-HNB.originatingChannel if request is relayed)"
+    Auth_Bearer:
+      type: http
+      description: "Enter the Oauth2 token as issued by the AGW"
+      scheme: bearer
+
+  ##################################################################################################
+  responses:
+    HTTP_200:
+      description: OK - The operation was successful.
+      headers:
+        X-HNB.messageHash:
+          schema:
+            $ref: "#/components/schemas/__common_messageHash"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response"
+    HTTP_200_EXPANDEDRESOURCE:
+      description: OK - The operation was successful.
+      headers:
+        X-HNB.messageHash:
+          schema:
+            $ref: "#/components/schemas/__common_messageHash"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response_EXPANDEDRESOURCE"
+    HTTP_200_summary:
+      description: OK - The operation was successful.
+      headers:
+        X-HNB.messageHash:
+          schema:
+            $ref: "#/components/schemas/__common_messageHash"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response_summary"
+    HTTP_200_collection:
+      description: OK - The operation was successful.
+      headers:
+        X-HNB.messageHash:
+          schema:
+            $ref: "#/components/schemas/__common_messageHash"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response_collection"
+    HTTP_200_collection_summary:
+      description: OK - The operation was successful.
+      headers:
+        X-HNB.messageHash:
+          schema:
+            $ref: "#/components/schemas/__common_messageHash"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response_collection_summary"
+    __common_ping_HTTP_200:
+      description: OK - The operation was successful.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/__common_ping_HTTP_200"
+    __common_HTTP_400:
+      description: "Bad Request - the request was malformed or a parameter failed validation."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/__common_Error_Response"
+    __common_HTTP_401:
+      description: "Unauthorized - the OAuth2 token is missing, expired, or invalid."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/__common_Error_Response"
+    __common_HTTP_403:
+      description: "Forbidden - the token is valid but lacks the required scope."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/__common_Error_Response"
+    __common_HTTP_404:
+      description: "Not Found - the requested resource does not exist.  Returned ONLY for single-resource operations; a collection search with no matches returns 200 with an empty array."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/__common_Error_Response"
+    __common_HTTP_500:
+      description: "Internal Server Error - an unexpected condition occurred within the service or an upstream source."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/__common_Error_Response"
+    __common_HTTP_default:
+      description: "Unexpected error - catches any status not explicitly documented above."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/__common_Error_Response"
+
+  ##################################################################################################
+  # PARAMETERS
+  #
+  # RULE (ReST section of the standard): every query parameter MUST be a field that exists in
+  # _RESOURCE or in the metadata. You cannot filter on something you have not exposed.
+  # This means the field list and the filter list are ONE decision, made once.
+  ##################################################################################################
+  parameters:
+    # ---- PATH ------------------------------------------------------------------------------
+    # The ONLY legal path parameter for this collection.
+    cyberInventoriesServerId_Path:
+      name: cyberInventoriesServerId
+      in: path
+      required: true
+      description: "Unique Id of a Cyber Inventories Server - a GUID/UUID. [ANSWER-NEEDED Q03] Confirm this maps to the CMDB sys_id."
+      schema:
+        $ref: "#/components/schemas/cyberInventoriesServerId"
+
+    # ---- COLLECTION-SPECIFIC FILTERS -------------------------------------------------------
+    assetId_Query:
+      name: assetId
+      in: query
+      required: false
+      description: "Filter to the server carrying this asset identifier.  NOTE: assetId is a QUERY parameter, not a path parameter - per the standard, only the collection resource id may appear in the path."
+      schema:
+        $ref: "#/components/schemas/cyber-inventories-servers_assetId"
+    serverName_Query:
+      name: serverName
+      in: query
+      required: false
+      description: "Filter by server name.  [ANSWER-NEEDED Q14] Is partial/contains matching supported, or exact match only?"
+      schema:
+        $ref: "#/components/schemas/cyber-inventories-servers_serverName"
+    fullyQualifiedDomainName_Query:
+      name: fullyQualifiedDomainName
+      in: query
+      required: false
+      description: "Filter by fully qualified domain name."
+      schema:
+        $ref: "#/components/schemas/cyber-inventories-servers_fullyQualifiedDomainName"
+    environmentCode_Query:
+      name: environmentCode
+      in: query
+      required: false
+      description: "Filter by deployment environment."
+      schema:
+        $ref: "#/components/schemas/cyber-inventories-servers_environmentCode"
+    operationalStatusCode_Query:
+      name: operationalStatusCode
+      in: query
+      required: false
+      description: "Filter by operational status."
+      schema:
+        $ref: "#/components/schemas/cyber-inventories-servers_operationalStatusCode"
+    installStatusCode_Query:
+      name: installStatusCode
+      in: query
+      required: false
+      description: "Filter by install status."
+      schema:
+        $ref: "#/components/schemas/cyber-inventories-servers_installStatusCode"
+    applicationCorrelationReference_Query:
+      name: applicationCorrelationReference
+      in: query
+      required: false
+      description: "Filter to servers supporting the application with this CMDB correlation identifier.  This is the join key between the servers and applications collections."
+      schema:
+        $ref: "#/components/schemas/cyber-inventories-servers_applicationCorrelationReference"
+    supportGroupName_Query:
+      name: supportGroupName
+      in: query
+      required: false
+      description: "Filter by the assigned support group."
+      schema:
+        $ref: "#/components/schemas/cyber-inventories-servers_supportGroupName"
+    riskRatingCode_Query:
+      name: riskRatingCode
+      in: query
+      required: false
+      description: "Filter by assessed risk rating."
+      schema:
+        $ref: "#/components/schemas/cyber-inventories-servers_riskRatingCode"
+    internetFacingIndicator_Query:
+      name: internetFacingIndicator
+      in: query
+      required: false
+      description: "Filter to servers that are (true) or are not (false) reachable from the public internet."
+      schema:
+        type: boolean
+        example: true
+    virtualIndicator_Query:
+      name: virtualIndicator
+      in: query
+      required: false
+      description: "Filter to virtual (true) or physical (false) servers."
+      schema:
+        type: boolean
+        example: true
+    operatingSystemName_Query:
+      name: operatingSystemName
+      in: query
+      required: false
+      description: "Filter by operating system name."
+      schema:
+        $ref: "#/components/schemas/cyber-inventories-servers_operatingSystemName"
+    lastDiscoveredTimestamp_min_Query:
+      name: lastDiscoveredTimestamp_min
+      in: query
+      required: false
+      description: "Inclusive lower bound on the last discovery timestamp.  Use with _max to express a range.  Servers with an older timestamp than expected indicate stale or lost discovery coverage."
+      schema:
+        type: string
+        format: date-time
+        example: "2026-01-01T00:00:00.000000Z"
+    lastDiscoveredTimestamp_max_Query:
+      name: lastDiscoveredTimestamp_max
+      in: query
+      required: false
+      description: "Inclusive upper bound on the last discovery timestamp."
+      schema:
+        type: string
+        format: date-time
+        example: "2026-12-31T23:59:59.999999Z"
+
+    # ---- AGGREGATE VISIBILITY (show_ pattern) ----------------------------------------------
+    # Controls whether an aggregate defined in _RESOURCE is returned. Each show_ parameter
+    # MUST correspond to an aggregate that exists in _RESOURCE.
+    show_infrastructure_Query:
+      name: show_infrastructure
+      in: query
+      required: false
+      description: "Include the infrastructure aggregate in the response."
+      schema: { type: boolean, default: true }
+    show_ownership_Query:
+      name: show_ownership
+      in: query
+      required: false
+      description: "Include the ownership aggregate in the response."
+      schema: { type: boolean, default: true }
+    show_lifecycle_Query:
+      name: show_lifecycle
+      in: query
+      required: false
+      description: "Include the lifecycle aggregate in the response."
+      schema: { type: boolean, default: true }
+    show_riskAndSecurity_Query:
+      name: show_riskAndSecurity
+      in: query
+      required: false
+      description: "Include the riskAndSecurity aggregate in the response."
+      schema: { type: boolean, default: true }
+    show_vulnerability_Query:
+      name: show_vulnerability
+      in: query
+      required: false
+      description: "Include the vulnerability aggregate in the response."
+      schema: { type: boolean, default: true }
+    show_dataQuality_Query:
+      name: show_dataQuality
+      in: query
+      required: false
+      description: "Include the dataQuality aggregate in the response.  Reports which source supplied the record and when it was last reconciled."
+      schema: { type: boolean, default: true }
+
+    # ---- COMMON (copy verbatim from Heartbeats before submission) --------------------------
+    __common_field_list_Query:
+      name: field_list
+      in: query
+      required: false
+      description: "Comma-delimited list of fields to return.  Restricts the payload to only the named fields."
+      schema: { type: string, maxLength: 2000 }
+      example: "serverName,environmentCode"
+    __common_item_count_Query:
+      name: item_count
+      in: query
+      required: false
+      description: "Maximum number of resources to return in this page of results."
+      schema: { type: integer, minimum: 1, maximum: 1000, default: 100 }
+    __common_item_offset_Query:
+      name: item_offset
+      in: query
+      required: false
+      description: "Zero-based offset of the first resource to return."
+      schema: { type: integer, minimum: 0, default: 0 }
+    __common_include_total_results_Query:
+      name: include_total_results
+      in: query
+      required: false
+      description: "Include the total matching count in the response metadata.  May be expensive on large result sets."
+      schema: { type: boolean, default: false }
+    __common_count_only_Query:
+      name: count_only
+      in: query
+      required: false
+      description: "Return only the count of matching resources, with an empty payload."
+      schema: { type: boolean, default: false }
+    __common_sort_by_Query:
+      name: sort_by
+      in: query
+      required: false
+      description: "Comma-delimited list of fields to sort by.  Prefix a field with - for descending."
+      schema: { type: string, maxLength: 500 }
+      example: "-lastDiscoveredTimestamp"
+    __common_include_metadata_Query:
+      name: include_metadata
+      in: query
+      required: false
+      description: "Include the _metadata aggregate within each returned resource."
+      schema: { type: boolean, default: true }
+    __common_expand_resources_Query:
+      name: expand_resources
+      in: query
+      required: false
+      description: "Fetch and inline referenced resources from other collections rather than returning only their identifiers."
+      schema: { type: boolean, default: false }
+
+  ##################################################################################################
+  # SCHEMAS
+  #
+  # MANDATORY HIERARCHY (from the standard - "Does the Collection schema follow the same
+  # hierarchy as the example?"). Do not flatten this; the onboarding automation depends on it.
+  #
+  #   HTTP_200*  ->  Response*  ->  <collection>_base*  ->  _RESOURCE | _SUMMARY | _EXPANDEDRESOURCE
+  #
+  # Every collection-specific schema name is prefixed with the lower-back-bone-cased
+  # collection name followed by an underscore.
+  ##################################################################################################
+  schemas:
+    # ---- Response layer --------------------------------------------------------------------
+    Response:
+      type: object
+      properties:
+        _metadata:
+          $ref: "#/components/schemas/__common_metadata_Response_agw"
+        payload:
+          $ref: "#/components/schemas/cyber-inventories-servers_base"
+    Response_EXPANDEDRESOURCE:
+      type: object
+      properties:
+        _metadata:
+          $ref: "#/components/schemas/__common_metadata_Response_agw"
+        payload:
+          $ref: "#/components/schemas/cyber-inventories-servers_base_EXPANDEDRESOURCE"
+    Response_summary:
+      type: object
+      properties:
+        _metadata:
+          $ref: "#/components/schemas/__common_metadata_Response_agw"
+        payload:
+          $ref: "#/components/schemas/cyber-inventories-servers_base_summary"
+    Response_collection:
+      type: object
+      properties:
+        _metadata:
+          $ref: "#/components/schemas/__common_metadata_Response_Collection"
+        payload:
+          $ref: "#/components/schemas/cyber-inventories-servers_base"
+    Response_collection_summary:
+      type: object
+      properties:
+        _metadata:
+          $ref: "#/components/schemas/__common_metadata_Response_Collection"
+        payload:
+          $ref: "#/components/schemas/cyber-inventories-servers_base_summary"
+
+    # ---- base layer ------------------------------------------------------------------------
+    cyber-inventories-servers_base:
+      type: object
+      properties:
+        cyber-inventories-servers:
+          type: array
+          maxItems: 1000
+          items:
+            $ref: "#/components/schemas/cyber-inventories-servers_RESOURCE"
+    cyber-inventories-servers_base_summary:
+      type: object
+      properties:
+        cyber-inventories-servers:
+          type: array
+          maxItems: 1000
+          items:
+            $ref: "#/components/schemas/cyber-inventories-servers_SUMMARY"
+    cyber-inventories-servers_base_EXPANDEDRESOURCE:
+      type: object
+      properties:
+        cyber-inventories-servers:
+          type: array
+          maxItems: 1000
+          items:
+            $ref: "#/components/schemas/cyber-inventories-servers_EXPANDEDRESOURCE"
+
+    # ---- SUMMARY -----------------------------------------------------------------------------
+    # RULE: a limiter must contain ONLY a subset of the fields in _RESOURCE, and any field
+    # inside an aggregate in _RESOURCE must stay inside that same aggregate here.
+    # Everything below is a root-level field in _RESOURCE, so the structure is trivially the same.
+    cyber-inventories-servers_SUMMARY:
+      type: object
+      properties:
+        cyberInventoriesServerId:
+          $ref: "#/components/schemas/cyberInventoriesServerId"
+        assetId:
+          $ref: "#/components/schemas/cyber-inventories-servers_assetId"
+        serverName:
+          $ref: "#/components/schemas/cyber-inventories-servers_serverName"
+        description:
+          $ref: "#/components/schemas/cyber-inventories-servers_description"
+        environmentCode:
+          $ref: "#/components/schemas/cyber-inventories-servers_environmentCode"
+        environmentDescription:
+          $ref: "#/components/schemas/cyber-inventories-servers_environmentDescription"
+        operationalStatusCode:
+          $ref: "#/components/schemas/cyber-inventories-servers_operationalStatusCode"
+        operationalStatusDescription:
+          $ref: "#/components/schemas/cyber-inventories-servers_operationalStatusDescription"
+
+    # ---- RESOURCE ----------------------------------------------------------------------------
+    # [ANSWER-NEEDED Q15] FIELD SET NOT YET CONFIRMED.
+    # The board sticky reads "cmdb_ci_server (38)". If that is a field count, this resource is
+    # currently short. Every candidate CMDB column must be individually decided:
+    #     expose / omit / rename / split into Code + Description
+    # See FIELD-MAPPING section of CLAUDE-BUILD-SPEC.md for the full working list.
+    #
+    # RULE: _RESOURCE must END with the _metadata element. Do not add fields after it.
+    cyber-inventories-servers_RESOURCE:
+      type: object
+      properties:
+        cyberInventoriesServerId:
+          $ref: "#/components/schemas/cyberInventoriesServerId"
+        assetId:
+          $ref: "#/components/schemas/cyber-inventories-servers_assetId"
+        serverName:
+          $ref: "#/components/schemas/cyber-inventories-servers_serverName"
+        description:
+          $ref: "#/components/schemas/cyber-inventories-servers_description"
+        fullyQualifiedDomainName:
+          $ref: "#/components/schemas/cyber-inventories-servers_fullyQualifiedDomainName"
+        environmentCode:
+          $ref: "#/components/schemas/cyber-inventories-servers_environmentCode"
+        environmentDescription:
+          $ref: "#/components/schemas/cyber-inventories-servers_environmentDescription"
+        operationalStatusCode:
+          $ref: "#/components/schemas/cyber-inventories-servers_operationalStatusCode"
+        operationalStatusDescription:
+          $ref: "#/components/schemas/cyber-inventories-servers_operationalStatusDescription"
+        installStatusCode:
+          $ref: "#/components/schemas/cyber-inventories-servers_installStatusCode"
+        installStatusDescription:
+          $ref: "#/components/schemas/cyber-inventories-servers_installStatusDescription"
+        virtualIndicator:
+          $ref: "#/components/schemas/cyber-inventories-servers_virtualIndicator"
+        infrastructure:
+          $ref: "#/components/schemas/cyber-inventories-servers_infrastructure"
+        ownership:
+          $ref: "#/components/schemas/cyber-inventories-servers_ownership"
+        lifecycle:
+          $ref: "#/components/schemas/cyber-inventories-servers_lifecycle"
+        riskAndSecurity:
+          $ref: "#/components/schemas/cyber-inventories-servers_riskAndSecurity"
+        vulnerability:
+          $ref: "#/components/schemas/cyber-inventories-servers_vulnerability"
+        dataQuality:
+          $ref: "#/components/schemas/cyber-inventories-servers_dataQuality"
+        _metadata:
+          $ref: "#/components/schemas/__common_metadata_included"
+
+    # EXPANDEDRESOURCE is only filled out when another Collection is referenced by identifier.
+    # [ANSWER-NEEDED Q17] Should expand_resources inline the full application resource in place of
+    # ownership.applicationCorrelationReference? That requires copying the applications
+    # collection _RESOURCE schema into this document per the standard.
+    cyber-inventories-servers_EXPANDEDRESOURCE:
+      $ref: "#/components/schemas/cyber-inventories-servers_RESOURCE"
+
+    # ---- AGGREGATES --------------------------------------------------------------------------
+    cyber-inventories-servers_infrastructure:
+      type: object
+      description: "Physical and virtual characteristics of the server."
+      properties:
+        ipAddress:
+          $ref: "#/components/schemas/cyber-inventories-servers_ipAddress"
+        operatingSystemName:
+          $ref: "#/components/schemas/cyber-inventories-servers_operatingSystemName"
+        operatingSystemVersion:
+          $ref: "#/components/schemas/cyber-inventories-servers_operatingSystemVersion"
+        manufacturerName:
+          $ref: "#/components/schemas/cyber-inventories-servers_manufacturerName"
+        modelName:
+          $ref: "#/components/schemas/cyber-inventories-servers_modelName"
+        serialNumber:
+          $ref: "#/components/schemas/cyber-inventories-servers_serialNumber"
+        cpuCoreCount:
+          $ref: "#/components/schemas/cyber-inventories-servers_cpuCoreCount"
+        memoryCapacityGigabytes:
+          $ref: "#/components/schemas/cyber-inventories-servers_memoryCapacityGigabytes"
+
+    cyber-inventories-servers_ownership:
+      type: object
+      description: "Who is accountable for this server and which application it supports."
+      properties:
+        applicationCorrelationReference:
+          $ref: "#/components/schemas/cyber-inventories-servers_applicationCorrelationReference"
+        applicationName:
+          $ref: "#/components/schemas/cyber-inventories-servers_applicationName"
+        supportGroupName:
+          $ref: "#/components/schemas/cyber-inventories-servers_supportGroupName"
+        ownedByName:
+          $ref: "#/components/schemas/cyber-inventories-servers_ownedByName"
+        managedByName:
+          $ref: "#/components/schemas/cyber-inventories-servers_managedByName"
+        businessUnitName:
+          $ref: "#/components/schemas/cyber-inventories-servers_businessUnitName"
+
+    cyber-inventories-servers_lifecycle:
+      type: object
+      description: "Where this server sits in its operational life."
+      properties:
+        installedDate:
+          $ref: "#/components/schemas/cyber-inventories-servers_installedDate"
+        lastDiscoveredTimestamp:
+          $ref: "#/components/schemas/cyber-inventories-servers_lastDiscoveredTimestamp"
+        warrantyExpirationDate:
+          $ref: "#/components/schemas/cyber-inventories-servers_warrantyExpirationDate"
+        decommissionedDate:
+          $ref: "#/components/schemas/cyber-inventories-servers_decommissionedDate"
+        lifecycleStageCode:
+          $ref: "#/components/schemas/cyber-inventories-servers_lifecycleStageCode"
+        lifecycleStageDescription:
+          $ref: "#/components/schemas/cyber-inventories-servers_lifecycleStageDescription"
+
+    cyber-inventories-servers_riskAndSecurity:
+      type: object
+      description: "Assessed risk posture.  Sourced from the CMDB risk and security profile table."
+      properties:
+        riskRatingCode:
+          $ref: "#/components/schemas/cyber-inventories-servers_riskRatingCode"
+        riskRatingDescription:
+          $ref: "#/components/schemas/cyber-inventories-servers_riskRatingDescription"
+        dataClassificationCode:
+          $ref: "#/components/schemas/cyber-inventories-servers_dataClassificationCode"
+        dataClassificationDescription:
+          $ref: "#/components/schemas/cyber-inventories-servers_dataClassificationDescription"
+        internetFacingIndicator:
+          $ref: "#/components/schemas/cyber-inventories-servers_internetFacingIndicator"
+        complianceScopeCode:
+          $ref: "#/components/schemas/cyber-inventories-servers_complianceScopeCode"
+        complianceScopeDescription:
+          $ref: "#/components/schemas/cyber-inventories-servers_complianceScopeDescription"
+        exceptionRequestReference:
+          $ref: "#/components/schemas/cyber-inventories-servers_exceptionRequestReference"
+        exceptionExpirationDate:
+          $ref: "#/components/schemas/cyber-inventories-servers_exceptionExpirationDate"
+
+    cyber-inventories-servers_vulnerability:
+      type: object
+      description: "Open vulnerability counts and patch currency.  Supports the coverage metrics reporting use case."
+      properties:
+        criticalVulnerabilityCount:
+          $ref: "#/components/schemas/cyber-inventories-servers_criticalVulnerabilityCount"
+        highVulnerabilityCount:
+          $ref: "#/components/schemas/cyber-inventories-servers_highVulnerabilityCount"
+        mediumVulnerabilityCount:
+          $ref: "#/components/schemas/cyber-inventories-servers_mediumVulnerabilityCount"
+        lowVulnerabilityCount:
+          $ref: "#/components/schemas/cyber-inventories-servers_lowVulnerabilityCount"
+        lastScannedTimestamp:
+          $ref: "#/components/schemas/cyber-inventories-servers_lastScannedTimestamp"
+        patchCurrencyCode:
+          $ref: "#/components/schemas/cyber-inventories-servers_patchCurrencyCode"
+        patchCurrencyDescription:
+          $ref: "#/components/schemas/cyber-inventories-servers_patchCurrencyDescription"
+        scanCoverageIndicator:
+          $ref: "#/components/schemas/cyber-inventories-servers_scanCoverageIndicator"
+
+    # This aggregate exists BECAUSE of the red sticky note: "CMDB is NOT source of truth for
+    # everything" and "how to find what's NOT in CMDB". A consumer must be able to tell the
+    # difference between "this attribute is genuinely empty" and "we do not know".
+    # Without it the API reports absence and presence identically, which is the same silent
+    # wrong-answer failure mode as reporting a proxy certificate as a host certificate.
+    cyber-inventories-servers_dataQuality:
+      type: object
+      description: "Provenance and completeness of this record.  Absence of a server from this collection does NOT prove the server does not exist."
+      properties:
+        sourceSystemName:
+          $ref: "#/components/schemas/cyber-inventories-servers_sourceSystemName"
+        sourceRecordReference:
+          $ref: "#/components/schemas/cyber-inventories-servers_sourceRecordReference"
+        lastSynchronizedTimestamp:
+          $ref: "#/components/schemas/cyber-inventories-servers_lastSynchronizedTimestamp"
+        cmdbRecordFoundIndicator:
+          $ref: "#/components/schemas/cyber-inventories-servers_cmdbRecordFoundIndicator"
+        authoritativeSourceName:
+          $ref: "#/components/schemas/cyber-inventories-servers_authoritativeSourceName"
+
+    # ---- /retrieve request -------------------------------------------------------------------
+    cyber-inventories-servers_RETRIEVE_Request:
+      type: object
+      description: "Selection criteria for a bulk retrieve.  Fields must be a subset of _RESOURCE."
+      properties:
+        cyber-inventories-servers_retrieve:
+          type: array
+          maxItems: 1000
+          items:
+            type: object
+            properties:
+              collectionFields:
+                $ref: "#/components/schemas/retrieve_collectionFields"
+              operator:
+                type: string
+                enum: [equals, contains, startsWith, in]
+                default: equals
+                description: "Comparison applied to the supplied collectionFields."
+    retrieve_collectionFields:
+      type: object
+      description: "Subset of _RESOURCE fields usable as bulk selection criteria."
+      properties:
+        assetId:
+          $ref: "#/components/schemas/cyber-inventories-servers_assetId"
+        serverName:
+          $ref: "#/components/schemas/cyber-inventories-servers_serverName"
+        applicationCorrelationReference:
+          $ref: "#/components/schemas/cyber-inventories-servers_applicationCorrelationReference"
+
+    # ---- LEAF FIELD DEFINITIONS ---------------------------------------------------------------
+    #
+    # NAMING RULES APPLIED THROUGHOUT (from the Modeling section of the standard):
+    #   Id          reserved for EIM collection identifiers - Governance approves
+    #   Reference   an instance OUTSIDE a Huntington collection (used for CMDB sys_id refs)
+    #   Timestamp   ISO 8601, 32 chars   CCYY-MM-DDTHH:MM:SS.mmmmmm+05:00
+    #   Date        ISO 8601, 10 chars   CCYY-MM-DD
+    #   Indicator   boolean, literal true/false - never "Y"/"N", 1/0, or quoted
+    #   Code        programmatic value - MUST have a matching Description
+    #   Description human-readable partner to a Code
+    # FORBIDDEN as standalone names: status, statuses, number, distance, amount
+    # FORBIDDEN as suffixes: id, Identifier, identifier
+    #
+    # ENUM RULE: a string field with an enum must NOT carry minLength/maxLength.
+    # NUMBER RULE: integer/number fields use minimum/maximum only - never minLength/maxLength.
+
+    cyberInventoriesServerId:
+      maxLength: 36
+      minLength: 1
+      type: string
+      description: "Unique Id of a Cyber Inventories Server - a GUID/UUID.  Opaque; callers must not parse it.  [ANSWER-NEEDED Q03] Expected to be the CMDB sys_id."
+      example: "b8f3c19e-b20b-4468-b089-5d4c0b22394e"
+
+    cyber-inventories-servers_assetId:
+      maxLength: 40
+      minLength: 1
+      type: string
+      description: "Asset identifier assigned by asset management.  Used as a QUERY filter, not a path parameter.  [ANSWER-NEEDED Q03] Confirm format and uniqueness - if this is not globally unique, a lookup may legitimately return more than one server."
+      example: "AST0012345"
+
+    cyber-inventories-servers_serverName:
+      maxLength: 255
+      minLength: 1
+      type: string
+      description: "Short name of the server as recorded in the CMDB.  Case is normalised to lower case on retrieval so that WEB-01 and web-01 resolve to one record."
+      example: "web-prd-01"
+
+    cyber-inventories-servers_description:
+      maxLength: 500
+      minLength: 0
+      type: string
+      description: "Human-friendly description of the server and its purpose."
+      example: "Production web front end, east region"
+
+    cyber-inventories-servers_fullyQualifiedDomainName:
+      maxLength: 253
+      minLength: 1
+      type: string
+      description: "Fully qualified domain name.  253 characters is the DNS maximum."
+      example: "web-prd-01.hban.us"
+
+    cyber-inventories-servers_environmentCode:
+      type: string
+      enum: [production, disasterRecovery, staging, test, development, unknown]
+      description: "Deployment environment.  [ANSWER-NEEDED Q18] Confirm the enumerated values against the actual CMDB u_environment field - these are assumed."
+      example: "production"
+    cyber-inventories-servers_environmentDescription:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Human-readable partner to environmentCode."
+      example: "Production"
+
+    cyber-inventories-servers_operationalStatusCode:
+      type: string
+      enum: [operational, nonOperational, repairInProgress, retired, unknown]
+      description: "Operational status.  NOTE: the CMDB column is operational_status; a standalone field named status is FORBIDDEN by the standard, so it is renamed here and paired with a Description.  [ANSWER-NEEDED Q18] Confirm enumerated values."
+      example: "operational"
+    cyber-inventories-servers_operationalStatusDescription:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Human-readable partner to operationalStatusCode."
+      example: "Operational"
+
+    cyber-inventories-servers_installStatusCode:
+      type: string
+      enum: [installed, inStock, onOrder, inMaintenance, pendingInstall, pendingRepair, retired, absent, unknown]
+      description: "Install status.  Renamed from the CMDB install_status column for the same reason as operationalStatusCode.  [ANSWER-NEEDED Q18] Confirm enumerated values."
+      example: "installed"
+    cyber-inventories-servers_installStatusDescription:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Human-readable partner to installStatusCode."
+      example: "Installed"
+
+    cyber-inventories-servers_virtualIndicator:
+      type: boolean
+      default: false
+      description: "True when the server is virtual rather than physical.  Boolean per the Indicator suffix rule - never Y/N or 1/0."
+      example: true
+
+    cyber-inventories-servers_ipAddress:
+      maxLength: 45
+      minLength: 7
+      type: string
+      description: "Primary IP address.  45 characters accommodates IPv6.  [ANSWER-NEEDED Q19] SENSITIVITY - confirm with Cyber Architecture Review whether IP addresses may be returned, and to which consumers.  A fleet-wide list of hostnames, IPs, OS versions, internet-facing flags, and open vulnerability counts is a target list."
+      example: "10.24.11.8"
+
+    cyber-inventories-servers_operatingSystemName:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Operating system name."
+      example: "Red Hat Enterprise Linux"
+    cyber-inventories-servers_operatingSystemVersion:
+      maxLength: 50
+      minLength: 1
+      type: string
+      description: "Operating system version as reported by discovery."
+      example: "9.4"
+
+    cyber-inventories-servers_manufacturerName:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Hardware manufacturer."
+      example: "Dell Inc."
+    cyber-inventories-servers_modelName:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Hardware model.  Named modelName rather than modelIdentifier - the suffix Identifier is forbidden by the standard."
+      example: "PowerEdge R750"
+    cyber-inventories-servers_serialNumber:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Hardware serial.  NOTE: number is forbidden as a STANDALONE field name; serialNumber is a compound name and is acceptable.  [ANSWER-NEEDED Q20] Confirm with Governance."
+      example: "7XK4LM3"
+
+    cyber-inventories-servers_cpuCoreCount:
+      type: integer
+      minimum: 0
+      maximum: 4096
+      description: "Number of CPU cores.  Integer fields use minimum/maximum only - minLength/maxLength are not valid keywords for numbers."
+      example: 16
+    cyber-inventories-servers_memoryCapacityGigabytes:
+      type: integer
+      minimum: 0
+      maximum: 1048576
+      description: "Installed memory in gigabytes."
+      example: 128
+
+    cyber-inventories-servers_applicationCorrelationReference:
+      maxLength: 30
+      minLength: 1
+      type: string
+      description: "CMDB Correlation Id of the application this server supports.  Reference suffix is used because this points at an instance outside this collection.  THIS IS THE JOIN KEY between the servers and applications collections."
+      example: "301196"
+    cyber-inventories-servers_applicationName:
+      maxLength: 255
+      minLength: 1
+      type: string
+      description: "Name of the supported application as registered in the CMDB."
+      example: "Enterprise Event Hub"
+    cyber-inventories-servers_supportGroupName:
+      maxLength: 255
+      minLength: 1
+      type: string
+      description: "Assigned support group."
+      example: "Infrastructure Linux Support"
+    cyber-inventories-servers_ownedByName:
+      maxLength: 255
+      minLength: 1
+      type: string
+      description: "Individual recorded as owner.  [ANSWER-NEEDED Q19] Personal names are PII - confirm exposure is permitted, or replace with a group/role reference."
+      example: "Jane Doe"
+    cyber-inventories-servers_managedByName:
+      maxLength: 255
+      minLength: 1
+      type: string
+      description: "Individual recorded as manager.  Same PII consideration as ownedByName."
+      example: "John Roe"
+    cyber-inventories-servers_businessUnitName:
+      maxLength: 255
+      minLength: 1
+      type: string
+      description: "Business unit accountable for the server."
+      example: "Consumer Banking Technology"
+
+    cyber-inventories-servers_installedDate:
+      maxLength: 10
+      minLength: 10
+      type: string
+      format: date
+      description: "Date the server was installed.  ISO 8601, 10 characters."
+      example: "2023-06-14"
+    cyber-inventories-servers_lastDiscoveredTimestamp:
+      maxLength: 32
+      minLength: 20
+      type: string
+      format: date-time
+      description: "When discovery last observed this server.  ISO 8601.  A stale value here is the primary signal of lost discovery coverage."
+      example: "2026-08-15T04:12:07.114233Z"
+    cyber-inventories-servers_warrantyExpirationDate:
+      maxLength: 10
+      minLength: 10
+      type: string
+      format: date
+      description: "Hardware warranty expiry.  ISO 8601, 10 characters."
+      example: "2027-06-13"
+    cyber-inventories-servers_decommissionedDate:
+      maxLength: 10
+      minLength: 10
+      type: string
+      format: date
+      description: "Date the server was decommissioned, if applicable."
+      example: "2026-02-28"
+    cyber-inventories-servers_lifecycleStageCode:
+      type: string
+      enum: [planned, build, active, maintenance, endOfLife, decommissioned, unknown]
+      description: "Lifecycle stage.  [ANSWER-NEEDED Q18] Confirm enumerated values."
+      example: "active"
+    cyber-inventories-servers_lifecycleStageDescription:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Human-readable partner to lifecycleStageCode."
+      example: "Active"
+
+    cyber-inventories-servers_riskRatingCode:
+      type: string
+      enum: [critical, high, moderate, low, notAssessed]
+      description: "Assessed risk rating.  [ANSWER-NEEDED Q18] Confirm against the CMDB risk and security profile table."
+      example: "high"
+    cyber-inventories-servers_riskRatingDescription:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Human-readable partner to riskRatingCode."
+      example: "High"
+    cyber-inventories-servers_dataClassificationCode:
+      type: string
+      enum: [public, internal, confidential, restricted, notClassified]
+      description: "Classification of data handled by this server.  [ANSWER-NEEDED Q18] Confirm against the Huntington data classification scheme."
+      example: "confidential"
+    cyber-inventories-servers_dataClassificationDescription:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Human-readable partner to dataClassificationCode."
+      example: "Confidential"
+    cyber-inventories-servers_internetFacingIndicator:
+      type: boolean
+      default: false
+      description: "True when the server is reachable from the public internet."
+      example: false
+    cyber-inventories-servers_complianceScopeCode:
+      type: string
+      enum: [pci, sox, glba, ffiec, none, multiple]
+      description: "Regulatory scope applying to this server.  [ANSWER-NEEDED Q18] Confirm values and whether multiple scopes require an array instead of a single code."
+      example: "sox"
+    cyber-inventories-servers_complianceScopeDescription:
+      maxLength: 200
+      minLength: 1
+      type: string
+      description: "Human-readable partner to complianceScopeCode."
+      example: "Sarbanes-Oxley"
+    cyber-inventories-servers_exceptionRequestReference:
+      maxLength: 40
+      minLength: 1
+      type: string
+      description: "Reference to an approved security exception covering this server, from the exception management table.  Reference suffix used as this points outside the collection."
+      example: "EXC0004412"
+    cyber-inventories-servers_exceptionExpirationDate:
+      maxLength: 10
+      minLength: 10
+      type: string
+      format: date
+      description: "Expiry of the referenced exception.  A temporary exception that has quietly become permanent is a finding in its own right."
+      example: "2026-12-31"
+
+    cyber-inventories-servers_criticalVulnerabilityCount:
+      type: integer
+      minimum: 0
+      description: "Count of open critical-severity vulnerabilities."
+      example: 0
+    cyber-inventories-servers_highVulnerabilityCount:
+      type: integer
+      minimum: 0
+      description: "Count of open high-severity vulnerabilities."
+      example: 3
+    cyber-inventories-servers_mediumVulnerabilityCount:
+      type: integer
+      minimum: 0
+      description: "Count of open medium-severity vulnerabilities."
+      example: 11
+    cyber-inventories-servers_lowVulnerabilityCount:
+      type: integer
+      minimum: 0
+      description: "Count of open low-severity vulnerabilities."
+      example: 24
+    cyber-inventories-servers_lastScannedTimestamp:
+      maxLength: 32
+      minLength: 20
+      type: string
+      format: date-time
+      description: "When this server was last scanned for vulnerabilities.  A stale value means the counts above are stale, not that the server is clean - consumers MUST read this alongside the counts."
+      example: "2026-08-14T02:00:00.000000Z"
+    cyber-inventories-servers_patchCurrencyCode:
+      type: string
+      enum: [current, oneCycleBehind, twoCyclesBehind, moreThanTwoCyclesBehind, unknown]
+      description: "Patch currency relative to the enterprise patching cadence.  [ANSWER-NEEDED Q18] Confirm values and the definition of a cycle."
+      example: "current"
+    cyber-inventories-servers_patchCurrencyDescription:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "Human-readable partner to patchCurrencyCode."
+      example: "Current"
+    cyber-inventories-servers_scanCoverageIndicator:
+      type: boolean
+      default: false
+      description: "True when this server is confirmed in scope for vulnerability scanning.  False means the vulnerability counts are meaningless rather than zero - the distinction the coverage metrics use case depends on."
+      example: true
+
+    cyber-inventories-servers_sourceSystemName:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "System that supplied this record."
+      example: "CMDB"
+    cyber-inventories-servers_sourceRecordReference:
+      maxLength: 64
+      minLength: 1
+      type: string
+      description: "Identifier of the record in the source system, for traceability back to the origin."
+      example: "b8f3c19eb20b4468b0895d4c0b22394e"
+    cyber-inventories-servers_lastSynchronizedTimestamp:
+      maxLength: 32
+      minLength: 20
+      type: string
+      format: date-time
+      description: "When this record was last reconciled against its source."
+      example: "2026-08-16T01:00:00.000000Z"
+    cyber-inventories-servers_cmdbRecordFoundIndicator:
+      type: boolean
+      default: true
+      description: "False when this server was observed by another source but has NO corresponding CMDB record.  Directly supports the 'how do we find what is NOT in the CMDB' question raised in planning.  [ANSWER-NEEDED Q16] Confirm whether v1 surfaces non-CMDB-sourced servers at all, or only CMDB records."
+      example: true
+    cyber-inventories-servers_authoritativeSourceName:
+      maxLength: 100
+      minLength: 1
+      type: string
+      description: "The system of record for this server's attributes, where that is NOT the CMDB.  Present because the CMDB is explicitly not the source of truth for everything."
+      example: "Cloud Asset Inventory"
+
+    ##################################################################################################
+    # __common_ SCHEMAS
+    #
+    # !! REPLACE THIS ENTIRE BLOCK WITH A VERBATIM COPY FROM THE CURRENT HEARTBEATS TEMPLATE
+    #    BEFORE SUBMISSION. [ANSWER-NEEDED Q13]
+    #
+    # The definitions below are faithful to Heartbeats 3.1 in structure and let this file
+    # validate on its own, but the standard explicitly says not to author this section by hand.
+    # Copy it; do not maintain it.
+    ##################################################################################################
+    __common_messageHash:
+      type: string
+      maxLength: 64
+      minLength: 1
+      description: "Hash of the response message, returned as a header for integrity checking."
+      example: "d2f1a7c98b3e4a1c8f0b6e5d4c3b2a19"
+
+    __common_correlationId:
+      type: string
+      maxLength: 36
+      minLength: 1
+      description: "Unique Id for the initiating request, generated by the caller - ideally a GUID/UUID.  REQUIRED on every API call.  Logging and tracing depend on this value being provided."
+      example: "1e6a2b3c-4d5e-6f70-8a9b-0c1d2e3f4a5b"
+    __common_sessionId:
+      type: string
+      maxLength: 36
+      minLength: 1
+      description: "Unique Id for the overall user session, generated by the caller.  Used on ALL calls within that session."
+      example: "9f8e7d6c-5b4a-3210-9876-543210fedcba"
+    __common_idempotencyKeyResource:
+      type: string
+      maxLength: 36
+      minLength: 1
+      description: "Caller-supplied key used to suppress duplicate execution of non-idempotent operations.  Not used by this GET-only API."
+      example: "3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+    __common_periodReference:
+      type: string
+      maxLength: 64
+      minLength: 1
+      description: "ISO 8601 period this resource representation applies to."
+      example: "2026-08-01/2026-08-31"
+    __common_observedTimestamp:
+      type: string
+      format: date-time
+      maxLength: 32
+      minLength: 20
+      description: "When the state described by this resource was observed."
+      example: "2026-08-15T04:12:07.114233Z"
+    __common_resourceTimestamp:
+      type: string
+      format: date-time
+      maxLength: 32
+      minLength: 20
+      description: "Point in time for which the resource is being represented."
+      example: "2026-08-15T04:12:07.114233Z"
+    __common_resourceOwnerReference:
+      type: string
+      maxLength: 100
+      minLength: 1
+      description: "Reference to the owner of the resource."
+      example: "Cyber Engineering"
+
+    __common_status:
+      type: object
+      description: "One status entry.  NOTE: statuses is permitted here because it is the standard's own common structure; a COLLECTION-SPECIFIC field named status or statuses is forbidden."
+      properties:
+        severity:
+          type: string
+          enum: [info, warning, error, fatal]
+          description: "Severity of this status entry."
+        statusCode:
+          type: string
+          maxLength: 20
+          minLength: 1
+          description: "Huntington API status code - see the API Status Codes document."
+          example: "HNB-0000"
+        statusDescription:
+          type: string
+          maxLength: 500
+          minLength: 1
+          description: "Human-readable explanation of the status code."
+          example: "Success"
+    __common_statuses:
+      type: array
+      maxItems: 100
+      description: "Zero or more status entries describing the outcome of the operation."
+      items:
+        $ref: "#/components/schemas/__common_status"
+
+    __common_classificationHighwatermark:
+      type: string
+      maxLength: 40
+      minLength: 1
+      description: "Highest data classification present anywhere in this response."
+      example: "confidential"
+
+    __common_tracking:
+      type: object
+      description: "Audit trail for the resource within its source system."
+      properties:
+        createdTimestamp:
+          type: string
+          format: date-time
+          maxLength: 32
+          minLength: 20
+          example: "2023-06-14T10:22:03.000000Z"
+        createdByReference:
+          type: string
+          maxLength: 100
+          minLength: 1
+          example: "discovery.service"
+        lastUpdatedTimestamp:
+          type: string
+          format: date-time
+          maxLength: 32
+          minLength: 20
+          example: "2026-08-15T04:12:07.114233Z"
+        lastUpdatedByReference:
+          type: string
+          maxLength: 100
+          minLength: 1
+          example: "discovery.service"
+
+    __common_item_count:
+      type: integer
+      minimum: 0
+      description: "Number of resources returned in this page."
+      example: 100
+    __common_item_offset:
+      type: integer
+      minimum: 0
+      description: "Zero-based offset of the first resource in this page."
+      example: 0
+    __common_result_next:
+      type: string
+      maxLength: 2000
+      minLength: 1
+      description: "Opaque cursor for retrieving the next page of results."
+      example: "eyJvZmZzZXQiOjEwMH0"
+    __common_paging:
+      type: object
+      description: "Paging state for a collection response."
+      properties:
+        item_count:
+          $ref: "#/components/schemas/__common_item_count"
+        item_offset:
+          $ref: "#/components/schemas/__common_item_offset"
+        total_results:
+          type: integer
+          minimum: 0
+          description: "Total matching resources.  Present only when include_total_results is true."
+          example: 4821
+        result_next:
+          $ref: "#/components/schemas/__common_result_next"
+    __common_links:
+      type: object
+      description: "HATEOAS navigation links for paged collection results."
+      properties:
+        self:
+          type: string
+          maxLength: 2000
+          example: "https://agw-int.hban.us/hnb-cy-inv-srvr/1.0/cyber-inventories-servers?item_offset=0&item_count=100"
+        next:
+          type: string
+          maxLength: 2000
+          example: "https://agw-int.hban.us/hnb-cy-inv-srvr/1.0/cyber-inventories-servers?item_offset=100&item_count=100"
+        last:
+          type: string
+          maxLength: 2000
+          example: "https://agw-int.hban.us/hnb-cy-inv-srvr/1.0/cyber-inventories-servers?item_offset=4800&item_count=100"
+
+    # _metadata as INCLUDED WITHIN each resource. _RESOURCE must end with this.
+    __common_metadata_included:
+      type: object
+      properties:
+        correlationId:
+          $ref: "#/components/schemas/__common_correlationId"
+        sessionId:
+          $ref: "#/components/schemas/__common_sessionId"
+        idempotencyKeyResource:
+          $ref: "#/components/schemas/__common_idempotencyKeyResource"
+        periodReference:
+          $ref: "#/components/schemas/__common_periodReference"
+        observedTimestamp:
+          $ref: "#/components/schemas/__common_observedTimestamp"
+        resourceTimestamp:
+          $ref: "#/components/schemas/__common_resourceTimestamp"
+        resourceOwnerReference:
+          $ref: "#/components/schemas/__common_resourceOwnerReference"
+        statuses:
+          $ref: "#/components/schemas/__common_statuses"
+        tracking:
+          $ref: "#/components/schemas/__common_tracking"
+
+    # _metadata at the RESPONSE level for a single resource.
+    __common_metadata_Response_agw:
+      required: [correlationId]
+      type: object
+      properties:
+        correlationId:
+          $ref: "#/components/schemas/__common_correlationId"
+        sessionId:
+          $ref: "#/components/schemas/__common_sessionId"
+        statuses:
+          $ref: "#/components/schemas/__common_statuses"
+        classificationHighwatermark:
+          $ref: "#/components/schemas/__common_classificationHighwatermark"
+        links:
+          $ref: "#/components/schemas/__common_links"
+
+    # _metadata at the RESPONSE level for a collection - adds paging.
+    __common_metadata_Response_Collection:
+      type: object
+      properties:
+        correlationId:
+          $ref: "#/components/schemas/__common_correlationId"
+        sessionId:
+          $ref: "#/components/schemas/__common_sessionId"
+        paging:
+          $ref: "#/components/schemas/__common_paging"
+        statuses:
+          $ref: "#/components/schemas/__common_statuses"
+        classificationHighwatermark:
+          $ref: "#/components/schemas/__common_classificationHighwatermark"
+        links:
+          $ref: "#/components/schemas/__common_links"
+
+    __common_metadata_Response_Error:
+      required: [correlationId]
+      type: object
+      properties:
+        correlationId:
+          $ref: "#/components/schemas/__common_correlationId"
+        sessionId:
+          $ref: "#/components/schemas/__common_sessionId"
+        statuses:
+          $ref: "#/components/schemas/__common_statuses"
+
+    __common_Error_Response:
+      type: object
+      properties:
+        _metadata:
+          $ref: "#/components/schemas/__common_metadata_Response_Error"
+
+    __common_ping_HTTP_200:
+      type: object
+      properties:
+        _metadata:
+          $ref: "#/components/schemas/__common_metadata_Response_agw"
+        payload:
+          type: object
+          properties:
+            message:
+              type: string
+              maxLength: 200
+              minLength: 1
+              description: "Canned availability message."
+              example: "cyber-inventories-servers is available"
+####################################################################################################
+# END OF FILE
+#
+# PRE-SUBMISSION CHECKLIST
+#   [ ] grep -c "ANSWER-NEEDED" returns 0
+#   [ ] grep -c "PLACEHOLDER" returns 0
+#   [ ] Collection name and abbreviation approved by API Governance / Data Modeling
+#   [ ] Classification confirmed (HNB / Orch / App) - filename, module, title, proxyPrefix all match
+#   [ ] __common_ section replaced with a verbatim copy from the current Heartbeats template
+#   [ ] File renamed to the approved convention, e.g.
+#         HNB_Cyber-inventories-servers_1.0 20260817-XXX.yaml
+#       or, if Orchestration,
+#         Orch_Cyber-inventories-servers_1.0 20260817-XXX.yaml
+#   [ ] Validates cleanly in the SmartBear Swagger Editor
+#   [ ] API Deployment Summary record created, file date updated to match this file
+#   [ ] API Security Attestation checked on the Deployment Summary
+#   [ ] Cyber Architecture Review completed (see the sensitivity notes on ipAddress and ownedByName)
+#   [ ] If bypassing API Governance approval: 'API Gov Approved Date' and 'API Gov Approved By' left BLANK
+####################################################################################################
